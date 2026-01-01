@@ -10,7 +10,7 @@ import {
   Package,
   ShieldCheck,
   AlertCircle,
-  ScanBarcode,
+  ScanLine,
 } from "lucide-react";
 import { InventoryItem } from "@/lib/types";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -194,7 +194,7 @@ export default function InventoryPage() {
           />
         </div>
         <div className="relative">
-          <ScanBarcode className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <ScanLine className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             placeholder="Scan barcode or enter SKU (scanner auto-submits on Enter)..."

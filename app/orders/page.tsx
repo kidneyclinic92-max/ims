@@ -10,7 +10,7 @@ import {
   ShoppingCart,
   Package,
   ShieldCheck,
-  ScanBarcode,
+  ScanLine,
 } from "lucide-react";
 import { Order, OrderItem } from "@/lib/types";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -435,7 +435,7 @@ export default function OrdersPage() {
                   </button>
                 </div>
                 <div className="relative mb-4">
-                  <ScanBarcode className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <ScanLine className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type="text"
                     placeholder="Scan SKU or barcode to add quickly (scanner auto-submits on Enter)..."

@@ -7,7 +7,7 @@ import sql from 'mssql';
 // GET /api/inventory/[id] - Get single inventory item
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const cookieStore = await cookies();
@@ -21,9 +21,10 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const pool = await getConnection();
     const result = await pool.request()
-      .input('id', sql.UniqueIdentifier, params.id)
+      .input('id', sql.UniqueIdentifier, id)
       .query(`
         SELECT 
           i.*,
@@ -85,7 +86,7 @@ export async function GET(
 // PUT /api/inventory/[id] - Update inventory item
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const cookieStore = await cookies();
@@ -99,6 +100,7 @@ export async function PUT(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { id } = await params;
     const body = await request.json();
     const pool = await getConnection();
     const transaction = new sql.Transaction(pool);
@@ -126,7 +128,7 @@ export async function PUT(
 
       // Update inventory item
       const updateResult = await request_query
-        .input('id', sql.UniqueIdentifier, params.id)
+        .input('id', sql.UniqueIdentifier, id)
         .input('name', sql.NVarChar, body.name)
         .input('sku', sql.NVarChar, body.sku)
         .input('barcode', sql.NVarChar, body.barcode || null)
@@ -240,7 +242,7 @@ export async function PUT(
 // DELETE /api/inventory/[id] - Delete inventory item
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const cookieStore = await cookies();
@@ -254,9 +256,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { id } = await params;
     const pool = await getConnection();
     const result = await pool.request()
-      .input('id', sql.UniqueIdentifier, params.id)
+      .input('id', sql.UniqueIdentifier, id)
       .query('DELETE FROM inventory_items WHERE id = @id');
 
     return NextResponse.json({ success: true });
