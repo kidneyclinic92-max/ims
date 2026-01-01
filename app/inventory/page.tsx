@@ -110,7 +110,15 @@ export default function InventoryPage() {
     if (editingItem) {
       updateItem(editingItem.id, formData);
     } else {
-      addItem(formData);
+      // Include all required fields for new items
+      addItem({
+        ...formData,
+        reservedQuantity: 0,
+        availableQuantity: formData.quantity,
+        reorderPoint: formData.minStock,
+        reorderQuantity: formData.maxStock,
+        unitOfMeasure: "pcs",
+      });
     }
     handleCloseModal();
   };
