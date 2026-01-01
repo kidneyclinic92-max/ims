@@ -1,65 +1,204 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useInventoryStore } from "@/lib/store";
+import { Package, AlertTriangle, DollarSign, ShoppingCart, TrendingUp, BarChart3, ShieldCheck } from "lucide-react";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+
+export default function Dashboard() {
+  const { inventory, orders, isLoaded, getStats } = useInventoryStore();
+  const stats = getStats();
+
+  // Prepare chart data
+  const categoryData = inventory.reduce((acc, item) => {
+    const existing = acc.find((c) => c.name === item.category);
+    if (existing) {
+      existing.value += item.quantity;
+    } else {
+      acc.push({ name: item.category, value: item.quantity });
+    }
+    return acc;
+  }, [] as { name: string; value: number }[]);
+
+  const recentOrders = orders
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 5);
+
+  const lowStockItems = inventory.filter((item) => item.quantity <= item.minStock);
+  const restrictedItems = inventory.filter((item) => item.ageRestricted).length;
+
+  if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground">Overview of your inventory management system</p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Total Items</p>
+              <p className="text-2xl font-bold">{stats.totalItems}</p>
+            </div>
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Package className="h-6 w-6 text-primary" />
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Low Stock Items</p>
+              <p className="text-2xl font-bold text-destructive">{stats.lowStockItems}</p>
+            </div>
+            <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
+              <AlertTriangle className="h-6 w-6 text-destructive" />
+            </div>
+          </div>
         </div>
-      </main>
+
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Total Inventory Value</p>
+              <p className="text-2xl font-bold">${stats.totalValue.toLocaleString()}</p>
+            </div>
+            <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
+              <DollarSign className="h-6 w-6 text-green-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Pending Orders</p>
+              <p className="text-2xl font-bold">{stats.pendingOrders}</p>
+            </div>
+            <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center">
+              <ShoppingCart className="h-6 w-6 text-orange-600" />
+            </div>
+          </div>
+        </div>
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Restricted SKUs</p>
+              <p className="text-2xl font-bold">{restrictedItems}</p>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500/10">
+              <ShieldCheck className="h-6 w-6 text-indigo-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            Inventory by Category
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={categoryData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="value" fill="hsl(var(--primary))" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            Revenue Overview
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart
+              data={[
+                { month: "Jan", revenue: stats.totalRevenue * 0.8 },
+                { month: "Feb", revenue: stats.totalRevenue * 0.9 },
+                { month: "Mar", revenue: stats.totalRevenue },
+                { month: "Apr", revenue: stats.totalRevenue * 1.1 },
+                { month: "May", revenue: stats.totalRevenue * 1.2 },
+                { month: "Jun", revenue: stats.totalRevenue * 1.15 },
+              ]}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Recent Orders & Low Stock */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
+          <div className="space-y-3">
+            {recentOrders.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No orders yet</p>
+            ) : (
+              recentOrders.map((order) => (
+                <div key={order.id} className="flex items-center justify-between p-3 rounded-md bg-muted/50">
+                  <div>
+                    <p className="font-medium">{order.orderNumber}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {order.type === "sale" ? "Sale" : "Purchase"} • {order.status}
+                    </p>
+                  </div>
+                  <p className="font-semibold">${order.total.toFixed(2)}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <h3 className="text-lg font-semibold mb-4">Low Stock Alerts</h3>
+          <div className="space-y-3">
+            {lowStockItems.length === 0 ? (
+              <p className="text-sm text-muted-foreground">All items are well stocked</p>
+            ) : (
+              lowStockItems.map((item) => (
+                <div key={item.id} className="flex items-center justify-between p-3 rounded-md bg-destructive/10 border border-destructive/20">
+                  <div>
+                    <p className="font-medium">{item.name}</p>
+                    <p className="text-sm text-muted-foreground">SKU: {item.sku}</p>
+                    {item.ageRestricted && (
+                      <p className="text-xs text-amber-700 font-semibold flex items-center gap-1 mt-1">
+                        <ShieldCheck className="h-3 w-3" />
+                        {item.minAge || 21}+ ID required
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-destructive">{item.quantity}</p>
+                    <p className="text-xs text-muted-foreground">Min: {item.minStock}</p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

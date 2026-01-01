@@ -1,36 +1,197 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WareHouse.io - Inventory Management System
+
+A comprehensive inventory management system built with Next.js, React, and TypeScript. This application provides a complete solution for tracking products, managing orders, generating reports, and analyzing inventory data.
+
+## Features
+
+### 📊 Dashboard
+- Real-time overview of inventory statistics
+- Visual charts and graphs for inventory analysis
+- Low stock alerts
+- Recent orders tracking
+- Revenue overview
+
+### 📦 Inventory Management
+- Complete CRUD operations for inventory items
+- Search, filter, and barcode/SKU scanning
+- Low stock indicators
+- Category organization
+- Supplier and location management
+- Min/Max stock levels with auto alerts
+- Built-in compliance fields for age-restricted products
+
+### 🔐 Authentication & Roles
+- Secure login powered by JWTs
+- Role-aware UI (Admin vs. Staff)
+- Middleware protection for all dashboards
+- Session handling with HttpOnly cookies
+
+### 🛒 Orders Management
+- Create and manage purchase orders
+- Create and manage sales orders
+- Order status tracking (Pending, Processing, Completed, Cancelled)
+- Automatic inventory updates on order completion
+- Order item management
+- Customer and supplier tracking
+
+### 📈 Reports & Analytics
+- Revenue analytics
+- Category breakdown
+- Top selling items
+- Order status distribution
+- Monthly revenue trends
+- JSON + CSV exports for inventory and orders
+
+### ⚙️ Settings
+- Company information configuration
+- Notification preferences
+- Auto-reorder settings
+- Currency selection
+- Data management tools
+
+## Tech Stack
+
+- **Framework**: Next.js 16
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Charts**: Recharts
+- **Icons**: Lucide React
+- **State Management**: React Hooks with localStorage persistence
+- **Auth**: Next.js Route Handlers, JWT (JOSE), bcryptjs
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ installed
+- npm, yarn, pnpm, or bun package manager
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd inventorymanagementsystem
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Demo credentials
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Admin** — `admin / admin123`
+- **Staff** — `staff / staff123`
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+inventorymanagementsystem/
+├── app/
+│   ├── api/auth/           # Auth route handlers (login/logout/me)
+│   ├── inventory/          # Inventory management page
+│   ├── orders/             # Orders management page
+│   ├── reports/            # Reports and analytics page
+│   ├── settings/           # Settings page
+│   ├── login/              # Public login page
+│   ├── layout.tsx          # Root layout (with providers)
+│   ├── page.tsx            # Dashboard page
+│   └── globals.css         # Global styles
+├── components/
+│   ├── layout/             # Header & Sidebar
+│   └── providers/          # Auth context provider
+├── lib/
+│   ├── auth.ts             # JWT helpers and types
+│   ├── auth-users.ts       # Demo users + bcrypt auth
+│   ├── export.ts           # CSV export helpers
+│   ├── store.ts            # Data store and state management
+│   └── types.ts            # TypeScript type definitions
+└── public/                  # Static assets
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Data Storage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The application uses browser localStorage for data persistence. All inventory items and orders are stored locally in your browser. To backup your data:
 
-## Deploy on Vercel
+1. Go to the Reports page
+2. Use **JSON Export** for full backup or download **Inventory CSV / Orders CSV** for spreadsheets
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Key Features
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Inventory Management
+- Add, edit, and delete inventory items
+- Track quantities, prices, and costs
+- Set minimum and maximum stock levels
+- Organize by categories
+- Barcode/SKU scanning and compliance controls
+
+### Order Processing
+- Create purchase orders (incoming inventory)
+- Create sales orders (outgoing inventory)
+- Automatic inventory quantity updates
+- Order status management
+- Customer and supplier tracking
+- Fast item entry via scanner-ready input
+- Compliance confirmation for age-restricted products
+
+### Analytics
+- Visual charts and graphs
+- Revenue tracking
+- Category analysis
+- Top selling items
+- Order statistics
+- Export to CSV/JSON for external reporting
+
+## Development
+
+### Build for Production
+
+```bash
+npm run build
+npm start
+```
+
+### Linting
+
+```bash
+npm run lint
+```
+
+## Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
+## Notes
+
+- All data is stored locally in your browser's localStorage
+- Data persists across browser sessions
+- Export your data regularly for backup purposes
+- The application includes sample data on first load
+- Set an `AUTH_SECRET` environment variable in production to override the default JWT secret
+
+## License
+
+This project is private and proprietary.
+
+## Support
+
+For issues or questions, please contact the development team.
